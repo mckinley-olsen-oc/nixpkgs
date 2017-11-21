@@ -1,5 +1,14 @@
-{ stdenv, fetchgit, pkgconfig, vte, gtk3, ncurses, makeWrapper, wrapGAppsHook, symlinkJoin
+{ stdenv
+, fetchgit
+, pkgconfig
+, vte
+, gtk3
+, ncurses
+, makeWrapper
+, wrapGAppsHook
+, symlinkJoin
 , configFile ? null
+, disableCSD ? false
 }:
 
 let
@@ -13,7 +22,10 @@ let
       sha256 = "0s6dyg3vcqk5qcx90bs24wdnd3p56rdjdcanx4pcxvp6ksjl61jz";
     };
 
-    postPatch = "sed '1i#include <math.h>' -i termite.cc";
+    postPatch = ''
+        sed '1i#include <math.h>' -i termite.cc
+        ${if disableCSD then "sed '1615igtk_window_set_decorated(GTK_WINDOW(window), false);' -i termite.cc" else ""}
+      '';
 
     makeFlags = [ "VERSION=v${version}" "PREFIX=" "DESTDIR=$(out)" ];
 
